@@ -6,10 +6,25 @@ The game, Battleship, written in Java.
 
 1. Make sure you've installed all requirements
 2. Clone this repository:
-  `git clone https://github.com/ymarcus93/Java-Battleship`
+  `git clone https://github.com/nisotiya/Java-Battleship`
 3. Change into the directory of the project
 4. Use `javac *.java` to compile the source code
 5. To run the program: `java Battleship`
+
+## Unit Tests
+1. Download Maven to run unit tests
+2. Verify the download by running `mvn --version`
+3. Run the unit tests using `mvn test`
+
+## Build Test Suite and get email
+1. Create a `.credentials` file in the repo
+	1. Add gmail username & gmail app-password.
+       1. You will have to create an "app password". The regular google account password won't work because of security.
+   ```
+   myemail@gmail.com
+   app-passowrd
+   ``` 
+2. Run `bash buildTestSuite.sh <to-email>` to get the email status
 
 ## Usage
 
@@ -33,6 +48,7 @@ Here's a short explanation on how to use **Java-Battleship**:
 
 * JDK
 	* javac
+* Maven
 
 ## Version
 
