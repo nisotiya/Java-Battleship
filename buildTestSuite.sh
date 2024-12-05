@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
 fi
 
 echo "Check if maven is installed"
-mvn --version
+mvn --versiont
 if [ $? -eq 0 ]; then
     echo "maven is installed"
 else

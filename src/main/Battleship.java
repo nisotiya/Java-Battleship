@@ -45,7 +45,7 @@ public class Battleship
         }
     }
     
-    private static void compMakeGuess(Player comp, Player user)
+    static void compMakeGuess(Player comp, Player user)
     {
         Randomizer rand = new Randomizer();
         int row = rand.nextInt(0, 9);
@@ -79,7 +79,7 @@ public class Battleship
         reader.nextLine();
     }
 
-    private static String askForGuess(Player p, Player opp)
+    static String askForGuess(Player p, Player opp)
     {
         System.out.println("Viewing My Guesses:");
         p.oppGrid.printStatus();
@@ -125,7 +125,7 @@ public class Battleship
         }
     }
     
-    private static void setup(Player p)
+    static void setup(Player p)
     {
         p.playerGrid.printShips();
         System.out.println();
@@ -180,7 +180,7 @@ public class Battleship
         }
     }
 
-    private static void setupComputer(Player p)
+    static void setupComputer(Player p)
     {
         System.out.println();
         int counter = 1;
@@ -217,7 +217,7 @@ public class Battleship
         }
     }
     
-    private static boolean hasErrors(int row, int col, int dir, Player p, int count)
+    static boolean hasErrors(int row, int col, int dir, Player p, int count)
     {
         //System.out.println("DEBUG: count arg is " + count);
         
@@ -278,7 +278,7 @@ public class Battleship
         return false;
     }
     
-    private static boolean hasErrorsComp(int row, int col, int dir, Player p, int count)
+    static boolean hasErrorsComp(int row, int col, int dir, Player p, int count)
     {
         //System.out.println("DEBUG: count arg is " + count);
         
@@ -337,7 +337,7 @@ public class Battleship
 
 
     /*HELPER METHODS*/
-    private static int convertLetterToInt(String val)
+    static int convertLetterToInt(String val)
     {
         int toReturn = -1;
         switch (val)
@@ -369,7 +369,7 @@ public class Battleship
         return toReturn;
     }
     
-    private static String convertIntToLetter(int val)
+    static String convertIntToLetter(int val)
     {
         String toReturn = "Z";
         switch (val)
@@ -401,7 +401,7 @@ public class Battleship
         return toReturn;
     }
     
-    private static int convertUserColToProCol(int val)
+    static int convertUserColToProCol(int val)
     {
         int toReturn = -1;
         switch (val)
@@ -433,7 +433,7 @@ public class Battleship
         return toReturn;
     }
     
-    private static int convertCompColToRegular(int val)
+    static int convertCompColToRegular(int val)
     {
         int toReturn = -1;
         switch (val)
