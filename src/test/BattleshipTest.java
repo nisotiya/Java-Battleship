@@ -1,8 +1,6 @@
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Disabled;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -11,14 +9,14 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-public class BattleshipTest {
+class BattleshipTest {
     private Player player;
     private Player computer;
     private final ByteArrayOutputStream outputContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final java.io.InputStream originalIn = System.in;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         player = new Player();
         computer = new Player();
@@ -27,7 +25,7 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(System.in);
     }
 
-    @After
+    @AfterEach
     public void restoreStreams() {
         System.setOut(originalOut);
         System.setIn(originalIn);
@@ -44,7 +42,7 @@ public class BattleshipTest {
 
 
     @Test
-    public void testShipPlacement() {
+    void testShipPlacement() {
         provideInput(
                 "A\n1\n0\n" + // Ship 1
                         "B\n2\n1\n" + // Ship 2
@@ -54,13 +52,13 @@ public class BattleshipTest {
         );
         Battleship.setup(player);
 
-        assertEquals("All ships should be placed", 0, player.numOfShipsLeft());
-        assertTrue("First ship should be placed", player.playerGrid.hasShip(0, 0));
-        assertTrue("Second ship should be placed", player.playerGrid.hasShip(1, 1));
+        Assertions.assertEquals(0, player.numOfShipsLeft(), "All ships should be placed");
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0), "First ship should be placed");
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1), "Second ship should be placed");
     }
 
     @Test
-    public void testInvalidShipPlacement() {
+    void testInvalidShipPlacement() {
         String input = "A\n11\n0\n" +
                 "A\n1\n0\n" +
                 "B\n2\n0\n" +
@@ -73,42 +71,42 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(inputStream);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertEquals(0, player.numOfShipsLeft());
     }
 
 
     @Test
-    public void testCoordinateConversions() {
-        assertEquals(0, Battleship.convertLetterToInt("A"));
-        assertEquals(9, Battleship.convertLetterToInt("J"));
-        assertEquals(-1, Battleship.convertLetterToInt("Z"));
+    void testCoordinateConversions() {
+        Assertions.assertEquals(0, Battleship.convertLetterToInt("A"));
+        Assertions.assertEquals(9, Battleship.convertLetterToInt("J"));
+        Assertions.assertEquals(-1, Battleship.convertLetterToInt("Z"));
 
-        assertEquals("A", Battleship.convertIntToLetter(0));
-        assertEquals("J", Battleship.convertIntToLetter(9));
-        assertEquals("Z", Battleship.convertIntToLetter(10));
+        Assertions.assertEquals("A", Battleship.convertIntToLetter(0));
+        Assertions.assertEquals("J", Battleship.convertIntToLetter(9));
+        Assertions.assertEquals("Z", Battleship.convertIntToLetter(10));
 
-        assertEquals(0, Battleship.convertUserColToProCol(1));
-        assertEquals(9, Battleship.convertUserColToProCol(10));
-        assertEquals(-1, Battleship.convertUserColToProCol(11));
+        Assertions.assertEquals(0, Battleship.convertUserColToProCol(1));
+        Assertions.assertEquals(9, Battleship.convertUserColToProCol(10));
+        Assertions.assertEquals(-1, Battleship.convertUserColToProCol(11));
     }
 
     @Test
-    public void testPlayerGuessing() {
+    void testPlayerGuessing() {
         computer.ships[0].setLocation(0, 0);
         computer.ships[0].setDirection(Ship.HORIZONTAL);
         computer.playerGrid.addShip(computer.ships[0]);
 
         provideInput("A\n1\n");
         String result = Battleship.askForGuess(player, computer);
-        assertTrue("Should be a hit", result.contains("HIT"));
+        Assertions.assertTrue(result.contains("HIT"), "Should be a hit");
 
         provideInput("B\n1\n");
         result = Battleship.askForGuess(player, computer);
-        assertTrue("Should be a miss", result.contains("MISS"));
+        Assertions.assertTrue(result.contains("MISS"), "Should be a miss");
     }
 
     @Test
-    public void testComputerGuessing() {
+    void testComputerGuessing() {
         Randomizer.theInstance = new Random(123);
         player.ships[0].setLocation(5, 5);
         player.ships[0].setDirection(0);
@@ -129,42 +127,42 @@ public class BattleshipTest {
                 }
             }
         }
-        assertTrue("Computer should make at least one guess", totalGuesses > 0);
+        Assertions.assertTrue(totalGuesses > 0, "Computer should make at least one guess");
     }
 
 
     @Test
-    public void testWinConditions() {
+    void testWinConditions() {
         for (int i = 0; i < 17; i++) {
             player.playerGrid.markHit(0, i % 10);
         }
-        assertTrue("Player should lose after 17 hits", player.playerGrid.hasLost());
+        Assertions.assertTrue(player.playerGrid.hasLost(), "Player should lose after 17 hits");
 
         for (int i = 0; i < 17; i++) {
             computer.playerGrid.markHit(0, i % 10);
         }
-        assertTrue("Computer should lose after 17 hits", computer.playerGrid.hasLost());
+        Assertions.assertTrue(computer.playerGrid.hasLost(), "Computer should lose after 17 hits");
     }
 
     @Test
-    public void testGridPrinting() {
+    void testGridPrinting() {
         player.ships[0].setLocation(0, 0);
         player.ships[0].setDirection(Ship.HORIZONTAL);
         player.playerGrid.addShip(player.ships[0]);
 
         outputContent.reset();
         player.playerGrid.printStatus();
-        assertTrue("Grid status should show unguessed cells", outputContent.toString().contains("-"));
+        Assertions.assertTrue(outputContent.toString().contains("-"), "Grid status should show unguessed cells");
 
         outputContent.reset();
         player.playerGrid.printShips();
-        assertTrue("Grid should show the ship's placement", outputContent.toString().contains("A"));
+        Assertions.assertTrue(outputContent.toString().contains("A"), "Grid should show the ship's placement");
     }
 
     @Test
-    public void testComputerSetup() {
+    void testComputerSetup() {
         Battleship.setupComputer(computer);
-        assertEquals("All computer ships should be placed", 0, computer.numOfShipsLeft());
+        Assertions.assertEquals(0, computer.numOfShipsLeft(), "All computer ships should be placed");
 
         int shipSpaces = 0;
         for (int i = 0; i < Grid.NUM_ROWS; i++) {
@@ -174,11 +172,11 @@ public class BattleshipTest {
                 }
             }
         }
-        assertEquals("Should have correct number of ship spaces", 17, shipSpaces);
+        Assertions.assertEquals(17, shipSpaces, "Should have correct number of ship spaces");
     }
 
     @Test
-    public void testMainGameLoop() {
+    void testMainGameLoop() {
         Randomizer.theInstance = new Random(123);
         StringBuilder input = new StringBuilder();
         // Setup phase
@@ -201,11 +199,11 @@ public class BattleshipTest {
         }
 
         String output = outputContent.toString();
-        assertTrue(output.contains("JAVA BATTLESHIP"));
+        Assertions.assertTrue(output.contains("JAVA BATTLESHIP"));
     }
 
     @Test
-    public void testSetupWithInvalidInputs() {
+    void testSetupWithInvalidInputs() {
         // Input for 5 ship placements with forced valid inputs
         StringBuilder input = new StringBuilder();
         input.append("A\n1\n0\n")    // Ship 1
@@ -219,12 +217,12 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
-        assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
     }
 
     @Test
-    public void testComputerGuessWithShipHit() {
+    void testComputerGuessWithShipHit() {
         Randomizer.theInstance = new Random(42);
         player.ships[0].setLocation(0, 0);
         player.ships[0].setDirection(0);
@@ -246,11 +244,11 @@ public class BattleshipTest {
                 if (computer.oppGrid.get(i, j).checkMiss()) foundMiss = true;
             }
         }
-        assertTrue(foundHit || foundMiss);
+        Assertions.assertTrue(foundHit || foundMiss);
     }
 
     @Test
-    public void testSetupComputer() {
+    void testSetupComputer() {
         Randomizer.theInstance = new Random(42);
         Battleship.setupComputer(computer);
 
@@ -261,10 +259,10 @@ public class BattleshipTest {
                 if (computer.playerGrid.hasShip(i, j)) shipCount++;
             }
         }
-        assertEquals(17, shipCount);
+        Assertions.assertEquals(17, shipCount);
 
         // Test overlapping prevention
-        assertFalse(hasOverlappingShips(computer.playerGrid));
+        Assertions.assertFalse(hasOverlappingShips(computer.playerGrid));
     }
 
     private boolean hasOverlappingShips(Grid grid) {
@@ -279,30 +277,30 @@ public class BattleshipTest {
     }
 
     @Test
-    public void testAllLetterConversions() {
+    void testAllLetterConversions() {
         for (char c = 'A'; c <= 'J'; c++) {
             int expected = c - 'A';
-            assertEquals(expected, Battleship.convertLetterToInt(String.valueOf(c)));
-            assertEquals(String.valueOf(c), Battleship.convertIntToLetter(expected));
+            Assertions.assertEquals(expected, Battleship.convertLetterToInt(String.valueOf(c)));
+            Assertions.assertEquals(String.valueOf(c), Battleship.convertIntToLetter(expected));
         }
-        assertEquals(-1, Battleship.convertLetterToInt("K"));
-        assertEquals("Z", Battleship.convertIntToLetter(10));
+        Assertions.assertEquals(-1, Battleship.convertLetterToInt("K"));
+        Assertions.assertEquals("Z", Battleship.convertIntToLetter(10));
     }
 
     @Test
-    public void testAllColumnConversions() {
+    void testAllColumnConversions() {
         for (int i = 1; i <= 10; i++) {
-            assertEquals(i-1, Battleship.convertUserColToProCol(i));
-            assertEquals(i, Battleship.convertCompColToRegular(i-1));
+            Assertions.assertEquals(i-1, Battleship.convertUserColToProCol(i));
+            Assertions.assertEquals(i, Battleship.convertCompColToRegular(i-1));
         }
-        assertEquals(-1, Battleship.convertUserColToProCol(11));
-        assertEquals(-1, Battleship.convertUserColToProCol(0));
-        assertEquals(-1, Battleship.convertCompColToRegular(-1));
-        assertEquals(-1, Battleship.convertCompColToRegular(10));
+        Assertions.assertEquals(-1, Battleship.convertUserColToProCol(11));
+        Assertions.assertEquals(-1, Battleship.convertUserColToProCol(0));
+        Assertions.assertEquals(-1, Battleship.convertCompColToRegular(-1));
+        Assertions.assertEquals(-1, Battleship.convertCompColToRegular(10));
     }
 
     @Test
-    public void testComputer100RandomGuesses() {
+    void testComputer100RandomGuesses() {
         Randomizer.theInstance = new Random(42);
         player.ships[0].setLocation(0, 0);
         player.ships[0].setDirection(0);
@@ -322,11 +320,11 @@ public class BattleshipTest {
                 if(computer.oppGrid.get(i,j).checkMiss()) foundMiss = true;
             }
         }
-        assertTrue("Should find both hits and misses", foundHit && foundMiss);
+        Assertions.assertTrue(foundHit && foundMiss, "Should find both hits and misses");
     }
 
     @Test
-    public void testBoundaryAndInvalidInputs() {
+    void testBoundaryAndInvalidInputs() {
         StringBuilder input = new StringBuilder();
         input.append("A\n1\n0\n")    // Ship 1
                 .append("B\n2\n0\n")    // Ship 2
@@ -340,15 +338,15 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertEquals(0, player.numOfShipsLeft());
 
         // Test boundary conditions
-        assertTrue(player.playerGrid.hasShip(0, 0));
-        assertFalse(player.playerGrid.hasShip(9, 9));
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertFalse(player.playerGrid.hasShip(9, 9));
     }
 
     @Test
-    public void testGameFlow() {
+    void testGameFlow() {
         // Setup phase with valid inputs
         StringBuilder input = new StringBuilder();
         for(int i = 0; i < 5; i++) {
@@ -370,7 +368,7 @@ public class BattleshipTest {
     }
 
     @Test
-    public void testComputerGuessesAndHits() {
+    void testComputerGuessesAndHits() {
         String input = String.join("\n", "enter", "enter", "");
         provideInput(input);
 
@@ -390,13 +388,13 @@ public class BattleshipTest {
                 }
             }
         }
-        assertTrue(guessFound);
+        Assertions.assertTrue(guessFound);
     }
 
 
 
     @Test
-    public void testAllPlacementScenarios() {
+    void testAllPlacementScenarios() {
         // Test all valid placement combinations
         String input = String.join("\n",
                 "A", "1", "0",  // Valid
@@ -411,15 +409,15 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertEquals(0, player.numOfShipsLeft());
 
         // Verify placements
-        assertTrue(player.playerGrid.hasShip(0, 0));
-        assertTrue(player.playerGrid.hasShip(1, 1));
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1));
     }
 
     @Test
-    public void testGameEndScenarios() {
+    void testGameEndScenarios() {
         // Setup game state
         setupGameStateForTesting();
 
@@ -428,7 +426,7 @@ public class BattleshipTest {
             player.playerGrid.markHit(0, i % 10);
         }
 
-        assertTrue(player.playerGrid.hasLost());
+        Assertions.assertTrue(player.playerGrid.hasLost());
     }
 
     private void setupGameStateForTesting() {
@@ -442,7 +440,7 @@ public class BattleshipTest {
     }
 
     @Test
-    public void testSetupWithInvalidAndEdgeInputs() {
+    void testSetupWithInvalidAndEdgeInputs() {
         String input = String.join("\n",
                 "A", "1", "0",  // First ship
                 "B", "2", "0",  // Second ship
@@ -456,13 +454,13 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
-        assertTrue(player.playerGrid.hasShip(0, 0));
-        assertTrue(player.playerGrid.hasShip(1, 1));
+        Assertions.assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1));
     }
 
     @Test
-    public void testAskForGuessAllScenarios() {
+    void testAskForGuessAllScenarios() {
         // Place ships
         computer.ships[0].setLocation(0, 0);
         computer.ships[0].setDirection(0);
@@ -475,7 +473,7 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         String result = Battleship.askForGuess(player, computer);
-        assertTrue(result.contains("HIT"));
+        Assertions.assertTrue(result.contains("HIT"));
 
         // Test miss
         String missInput = "B\n1\n";
@@ -484,11 +482,11 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         result = Battleship.askForGuess(player, computer);
-        assertTrue(result.contains("MISS"));
+        Assertions.assertTrue(result.contains("MISS"));
     }
 
     @Test
-    public void testCompMakeGuessAllScenarios() {
+    void testCompMakeGuessAllScenarios() {
         // Set fixed seed for deterministic behavior
         Randomizer.theInstance = new Random(42);
 
@@ -532,15 +530,14 @@ public class BattleshipTest {
             }
         }
 
-        assertTrue("Should find at least 1 hit", hits > 0);
-        assertTrue("Should make multiple valid guesses", hits + misses > 0);
+        Assertions.assertTrue(hits > 0, "Should find at least 1 hit");
+        Assertions.assertTrue(hits + misses > 0, "Should make multiple valid guesses");
     }
 
 
 
     @Test
-    @Ignore
-    public void testGridResetAndEdgeCases() {
+    void testGridResetAndEdgeCases() {
         // Add a ship and reset the grid
         player.ships[0].setLocation(0, 0);
         player.ships[0].setDirection(Ship.HORIZONTAL);
@@ -550,14 +547,13 @@ public class BattleshipTest {
 
         for (int i = 0; i < Grid.NUM_ROWS; i++) {
             for (int j = 0; j < Grid.NUM_COLS; j++) {
-                assertTrue("Grid should be empty after reset", player.playerGrid.get(i, j).isUnguessed());
+                Assertions.assertTrue(player.playerGrid.get(i, j).isUnguessed(), "Grid should be empty after reset");
             }
         }
     }
 
     @Test
-    @Ignore
-    public void testOverlappingShips() {
+    void testOverlappingShips() {
         // Place a ship
         player.ships[0].setLocation(0, 0);
         player.ships[0].setDirection(Ship.HORIZONTAL);
@@ -572,7 +568,7 @@ public class BattleshipTest {
     }
 
     @Test
-    public void testEdgeShipPlacement() {
+    void testEdgeShipPlacement() {
         String input = String.join("\n",
                 "A", "1", "0",  // First ship
                 "B", "2", "0",  // Second ship
@@ -588,13 +584,13 @@ public class BattleshipTest {
         Battleship.setup(player);
 
         // Verify ships placed correctly
-        assertTrue(player.playerGrid.hasShip(0, 0));
-        assertTrue(player.playerGrid.hasShip(1, 1));
-        assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1));
+        Assertions.assertEquals(0, player.numOfShipsLeft());
     }
 
     @Test
-    public void testInvalidGuessHandling() {
+    void testInvalidGuessHandling() {
         computer.ships[0].setLocation(0, 0);
         computer.ships[0].setDirection(0);
         computer.playerGrid.addShip(computer.ships[0]);
@@ -602,20 +598,20 @@ public class BattleshipTest {
         // Test invalid coordinates
         provideInput("Z\n11\nA\n1\n");
         String result = Battleship.askForGuess(player, computer);
-        assertTrue("Should handle invalid input", result.contains("MISS") || result.contains("HIT"));
+        Assertions.assertTrue(result.contains("MISS") || result.contains("HIT"), "Should handle invalid input");
     }
 
     @Test
-    public void testEmptyGridBeforePlacement() {
+    void testEmptyGridBeforePlacement() {
         for (int i = 0; i < Grid.NUM_ROWS; i++) {
             for (int j = 0; j < Grid.NUM_COLS; j++) {
-                assertTrue("Grid should be empty before placement", player.playerGrid.get(i, j).isUnguessed());
+                Assertions.assertTrue(player.playerGrid.get(i, j).isUnguessed(), "Grid should be empty before placement");
             }
         }
     }
 
     @Test
-    public void testFullGridGuessing() {
+    void testFullGridGuessing() {
         // Place ships in known positions
         computer.ships[0].setLocation(5, 5);
         computer.ships[0].setDirection(Ship.HORIZONTAL);
@@ -638,11 +634,11 @@ public class BattleshipTest {
             }
         }
 
-        assertTrue("All cells should be guessed", totalGuesses == Grid.NUM_ROWS * Grid.NUM_COLS);
+        Assertions.assertTrue(totalGuesses == Grid.NUM_ROWS * Grid.NUM_COLS, "All cells should be guessed");
     }
 
     @Test
-    public void testCompleteGameWithAllScenarios() {
+    void testCompleteGameWithAllScenarios() {
         // Ship placement phase
         String setupInput = String.join("\n",
                 "A", "1", "0",  // Ship 1
@@ -658,15 +654,15 @@ public class BattleshipTest {
 
         try {
             Battleship.setup(player);
-            assertEquals(0, player.numOfShipsLeft());
-            assertTrue(player.playerGrid.hasShip(0, 0));
+            Assertions.assertEquals(0, player.numOfShipsLeft());
+            Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
         } catch (NoSuchElementException e) {
-            fail("Setup should complete successfully");
+            Assertions.fail("Setup should complete successfully");
         }
     }
 
     @Test
-    public void testExtensiveComputerGuessing() {
+    void testExtensiveComputerGuessing() {
         // Set fixed seed for deterministic behavior
         Randomizer.theInstance = new Random(42);
 
@@ -709,11 +705,11 @@ public class BattleshipTest {
             }
         }
 
-        assertTrue("Should find both hits and misses", foundHit && foundMiss);
+        Assertions.assertTrue(foundHit && foundMiss, "Should find both hits and misses");
     }
 
     @Test
-    public void testBoundaryAndEdgeCases() {
+    void testBoundaryAndEdgeCases() {
         String input = String.join("\n",
                 // Valid ship placements
                 "A", "1", "0",
@@ -728,13 +724,13 @@ public class BattleshipTest {
         Battleship.reader = new Scanner(testIn);
 
         Battleship.setup(player);
-        assertEquals(0, player.numOfShipsLeft());
-        assertTrue(player.playerGrid.hasShip(0, 0));
-        assertTrue(player.playerGrid.hasShip(1, 1));
+        Assertions.assertEquals(0, player.numOfShipsLeft());
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0));
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1));
     }
 
     @Test
-    public void testRandomizedGamePlay() {
+    void testRandomizedGamePlay() {
         Randomizer.theInstance = new Random(42);
 
         // Ship placement input
@@ -757,38 +753,38 @@ public class BattleshipTest {
         }
 
         String output = outputContent.toString();
-        assertTrue(output.contains("BATTLESHIP"));
+        Assertions.assertTrue(output.contains("BATTLESHIP"));
     }
 
     @Test
-    public void testExtensiveGameScenarios() {
+    void testExtensiveGameScenarios() {
         // Test all possible coordinate combinations
         for (int i = 0; i < Grid.NUM_ROWS; i++) {
             for (int j = 0; j < Grid.NUM_COLS; j++) {
-                assertEquals(String.valueOf((char)('A' + i)), Battleship.convertIntToLetter(i));
-                assertEquals(j, Battleship.convertUserColToProCol(j + 1));
-                assertEquals(j + 1, Battleship.convertCompColToRegular(j));
+                Assertions.assertEquals(String.valueOf((char)('A' + i)), Battleship.convertIntToLetter(i));
+                Assertions.assertEquals(j, Battleship.convertUserColToProCol(j + 1));
+                Assertions.assertEquals(j + 1, Battleship.convertCompColToRegular(j));
             }
         }
     }
 
     @Test
-    public void testErrorConditionsAndBoundaries() {
+    void testErrorConditionsAndBoundaries() {
         // Test invalid inputs
-        assertEquals(-1, Battleship.convertLetterToInt("Z"));
-        assertEquals(-1, Battleship.convertLetterToInt("0"));
-        assertEquals(-1, Battleship.convertUserColToProCol(11));
-        assertEquals(-1, Battleship.convertUserColToProCol(0));
-        assertEquals(-1, Battleship.convertCompColToRegular(-1));
+        Assertions.assertEquals(-1, Battleship.convertLetterToInt("Z"));
+        Assertions.assertEquals(-1, Battleship.convertLetterToInt("0"));
+        Assertions.assertEquals(-1, Battleship.convertUserColToProCol(11));
+        Assertions.assertEquals(-1, Battleship.convertUserColToProCol(0));
+        Assertions.assertEquals(-1, Battleship.convertCompColToRegular(-1));
 
         // Test boundary conditions
-        assertTrue(Battleship.hasErrors(9, 9, 0, player, 0));
-        assertTrue(Battleship.hasErrors(9, 0, 1, player, 0));
-        assertFalse(Battleship.hasErrors(0, 0, 0, player, 0));
+        Assertions.assertTrue(Battleship.hasErrors(9, 9, 0, player, 0));
+        Assertions.assertTrue(Battleship.hasErrors(9, 0, 1, player, 0));
+        Assertions.assertFalse(Battleship.hasErrors(0, 0, 0, player, 0));
     }
 
     @Test
-    public void testCompleteGameFlow() {
+    void testCompleteGameFlow() {
         String input = String.join("\n",
                 // Ship placement - including invalid attempts
                 "Z", "A", "11", "1",  // Invalid inputs
@@ -818,7 +814,7 @@ public class BattleshipTest {
     }
 
     @Test
-    public void testShipPlacementAllScenarios() {
+    void testShipPlacementAllScenarios() {
         // Create input for 5 valid ship placements
         StringBuilder input = new StringBuilder();
         input.append("A\n1\n0\n")    // First ship
@@ -836,19 +832,19 @@ public class BattleshipTest {
         Battleship.setup(player);
 
         // Verify ships were placed
-        assertTrue("First ship should be placed at A1", player.playerGrid.hasShip(0, 0));
-        assertTrue("Second ship should be placed at B2", player.playerGrid.hasShip(1, 1));
-        assertTrue("Third ship should be placed at C3", player.playerGrid.hasShip(2, 2));
-        assertTrue("Fourth ship should be placed at D4", player.playerGrid.hasShip(3, 3));
-        assertTrue("Fifth ship should be placed at E5", player.playerGrid.hasShip(4, 4));
+        Assertions.assertTrue(player.playerGrid.hasShip(0, 0), "First ship should be placed at A1");
+        Assertions.assertTrue(player.playerGrid.hasShip(1, 1), "Second ship should be placed at B2");
+        Assertions.assertTrue(player.playerGrid.hasShip(2, 2), "Third ship should be placed at C3");
+        Assertions.assertTrue(player.playerGrid.hasShip(3, 3), "Fourth ship should be placed at D4");
+        Assertions.assertTrue(player.playerGrid.hasShip(4, 4), "Fifth ship should be placed at E5");
 
         // Verify the number of ships left is zero
-        assertEquals("All ships should be placed", 0, player.numOfShipsLeft());
+        Assertions.assertEquals(0, player.numOfShipsLeft(), "All ships should be placed");
     }
 
 
     @Test
-    public void testComputerGuessPatterns() {
+    void testComputerGuessPatterns() {
         // Set random seed for consistent testing
         Randomizer.theInstance = new Random(42);
 
@@ -889,7 +885,7 @@ public class BattleshipTest {
                 continue;
             }
         }
-        assertTrue("Computer should make at least one valid guess", foundHit || foundMiss);
+        Assertions.assertTrue(foundHit || foundMiss, "Computer should make at least one valid guess");
     }
 
 }
